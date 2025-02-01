@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/connect": "^3.4.38",
     "@types/connect-history-api-fallback": "^1.5.4",
+    "rollup": "^4.34.0",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3"
   },
@@ -24,6 +25,7 @@
     "cac": "^6.7.14",
     "connect": "^3.7.0",
     "connect-history-api-fallback": "^2.0.0",
+    "rollup-plugin-esbuild": "^6.1.1",
     "sirv": "^3.0.0"
   }
 }
