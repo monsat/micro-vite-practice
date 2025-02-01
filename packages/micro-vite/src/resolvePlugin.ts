@@ -6,6 +6,16 @@ const root = process.cwd()
 
 const extensions = ['', '.js', '.ts']
 
+const fileExists = async (path: string) => {
+  try {
+    const stat = await fs.stat(path)
+    if (stat.isFile()) {
+      return true
+    }
+  } catch {}
+  return false
+}
+
 export const resolve = (): Plugin => {
   return {
     name: 'micro-vite:resolve',
@@ -14,13 +24,19 @@ export const resolve = (): Plugin => {
       for (const ext of extensions) {
         const absolutePath = path.resolve(root, `.${id}${ext}`)
         // console.log('resolveId', id, absolutePath)
-        try {
-          const stat = await fs.stat(absolutePath)
-          if (stat.isFile()) {
-            return absolutePath
-          }
-        } catch {}
+        if (await fileExists(absolutePath)) {
+          return absolutePath
+        }
       }
+
+      // 末尾が / で終わる場合は index.html があるかをチェックして id を変更する
+      if (id.endsWith('/')) {
+        const absolutePath = path.resolve(root, `.${id}index.html`)
+        if (await fileExists(absolutePath)) {
+          return absolutePath
+        }
+      }
+
       return null
     },
     // パスのファイルを読み出す
