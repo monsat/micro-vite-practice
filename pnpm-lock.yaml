@@ -9,6 +9,10 @@ importers:
   .: {}
 
   packages/micro-vite:
+    dependencies:
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
     devDependencies:
       tsup:
         specifier: ^8.3.6
