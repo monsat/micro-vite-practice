@@ -4,9 +4,14 @@
   "description": "minimal vite like tool",
   "main": "dist/index.js",
   "scripts": {
+    "build": "tsup src/index.ts",
+    "watch": "tsup src/index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.3.6"
+  }
 }
