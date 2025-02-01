@@ -1,17 +1,30 @@
 import type { NextHandleFunction } from 'connect'
+import type { PluginContainer } from './pluginContainer'
 
-export const transformMiddleware = (): NextHandleFunction => {
+export const transformMiddleware = (pluginContainer: PluginContainer): NextHandleFunction => {
   const transformRequest = async (pathname: string): Promise<{
     mime: string
     content: string
   } | null> => {
-    if (pathname.endsWith('.ts')) {
-      return {
-        mime: 'application/javascript',
-        content: `console.log('file: ${pathname}')`,
-      }
+    const idResult = await pluginContainer.resolveId(pathname) || { id: pathname }
+
+    const loadResult = await pluginContainer.load(idResult.id)
+    if (!loadResult) {
+      return null
     }
-    return null
+
+    const code = typeof loadResult === 'string' ? loadResult : loadResult.code
+    const transformResult = await pluginContainer.transform(code, idResult.id)
+    if (!transformResult) {
+      return null
+    }
+
+    const mime = /\.[jt]s$/.test(idResult.id) ? 'application/javascript' : undefined
+    const content = transformResult.code
+    return {
+      mime,
+      content,
+    }
   }
 
   return async (req, res, next) => {
@@ -33,7 +46,9 @@ export const transformMiddleware = (): NextHandleFunction => {
       const result = await transformRequest(pathname)
       if (result) {
         res.statusCode = 200
-        res.setHeader('Content-Type', result.mime)
+        if (result.mime) {
+          res.setHeader('Content-Type', result.mime)
+        }
         return res.end(result.content)
       }
     } catch (e) {
