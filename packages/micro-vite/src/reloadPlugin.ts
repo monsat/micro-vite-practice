@@ -8,6 +8,7 @@ const virtualScript = `
   const ws = new WebSocket('ws://localhost:${port}')
   ws.addEventListener('message', ({ data }) => {
     const msg = JSON.parse(data)
+    console.log(\`Hot reload: \${msg.type}\`)
     // reload というメッセージが来たらリロードする
     if (msg.type === 'reload') {
       location.reload()
