@@ -48,7 +48,7 @@ cd packages/playground
 pnpm install
 ```
 
-## MEM<O
+## MEMO
 
 ### chokidar が動かない
 
