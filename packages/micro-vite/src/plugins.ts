@@ -1,14 +1,6 @@
-import { resolve } from './resolvePlugin'
+import type { Plugin } from 'rolldown'
 import { reload } from './reloadPlugin'
-import esbuild from 'rollup-plugin-esbuild'
 
-export const getPlugins = (isDev: boolean) => [
-  ...(isDev ? [
-    resolve(),
-    reload(),
-  ] : []),
-  esbuild({
-    target: isDev ? 'esnext' : 'es2019',
-    minify: !isDev,
-  }),
+export const getPlugins = (): Plugin[] => [
+  reload(),
 ]

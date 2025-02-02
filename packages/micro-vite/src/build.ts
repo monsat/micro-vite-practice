@@ -1,15 +1,24 @@
 import * as path from 'node:path'
 import * as fs from 'node:fs/promises'
 import parse from 'node-html-parser'
-import { rollup } from 'rollup'
-import { getPlugins } from './plugins'
+import { rolldown } from 'rolldown'
+import type { Plugin } from 'rolldown'
+
+import { insertVirtualScript } from './reloadPlugin'
 
 const root = process.cwd()
-const dist = path.resolve(root, './dist')
 
 export const startBuild = async () => {
-  const plugins = getPlugins(false) // 本番環境用のプラグインを取得
+  const dist = path.resolve(root, './dist')
+  const plugins: Plugin[] = []
+  await build(dist, plugins)
+}
 
+export const build = async (
+  dist: string,
+  plugins: Plugin[],
+  isDev = false,
+) => {
   await fs.rm(dist, {
     recursive: true,
     force: true,
@@ -20,9 +29,13 @@ export const startBuild = async () => {
   const indexHtmlPath = path.resolve(root, './index.html')
   const distIndexHtmlPath = path.resolve(dist, './index.html')
   // index.html を加工して dist/index.html に出力する
-  await processHtml(indexHtmlPath, distIndexHtmlPath, async (src) => {
-    // rollup でバンドルする
-    const bundle = await rollup({
+  await processHtml(
+    indexHtmlPath,
+    distIndexHtmlPath,
+    isDev,
+    async (src) => {
+    // rolldown でバンドルする
+    const bundle = await rolldown({
       input: path.resolve(root, `.${src}`),
       plugins,
     })
@@ -44,6 +57,7 @@ export const startBuild = async () => {
 const processHtml = async (
   srcPath: string,
   distPath: string,
+  isDev: boolean,
   // エントリーポイントの src を受け取って新しい src を返す関数
   bundleEntryPoint: (src: string) => Promise<string>,
 ) => {
@@ -56,6 +70,9 @@ const processHtml = async (
       const newSrc = await bundleEntryPoint(src)
       scriptTag.setAttribute('src', newSrc)
     }
+  }
+  if (isDev) {
+    insertVirtualScript(doc)
   }
   await fs.writeFile(distPath, doc.toString(), 'utf-8')
 }

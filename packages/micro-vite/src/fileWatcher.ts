@@ -7,6 +7,7 @@ export const createFileWatcher = (
     ignored: [
       'node_modules',
       '.git',
+      '.micro-vite',
     ],
     ignoreInitial: true, // listen 開始時は発火させない
   })

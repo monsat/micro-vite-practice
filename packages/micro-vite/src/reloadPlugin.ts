@@ -1,9 +1,12 @@
-import type { Plugin } from 'rollup'
+import type { Plugin } from 'rolldown'
+import * as path from 'node:path'
+import * as fs from 'node:fs/promises'
 import { parse } from 'node-html-parser'
 import WebSocket, { WebSocketServer } from 'ws'
 
+const root = process.cwd()
 const port = 24678
-const virtualScriptId = '/@micro-vite:reload/script.js'
+export const virtualScriptId = '/@micro-vite:reload/script.js'
 const virtualScript = `
   const ws = new WebSocket('ws://localhost:${port}')
   ws.addEventListener('message', ({ data }) => {
@@ -15,6 +18,21 @@ const virtualScript = `
     }
   })
 `
+
+const fileExists = async (path: string) => {
+  try {
+    const stat = await fs.stat(path)
+    if (stat.isFile()) {
+      return true
+    }
+  } catch {}
+  return false
+}
+
+export const insertVirtualScript = <T extends ReturnType<typeof parse>>(parsed: T): void => {
+  // head の末尾に virtualScriptId へのリンクのある script タグを挿入する
+  parsed.querySelector('head')?.insertAdjacentHTML('beforeend', `<script src="${virtualScriptId}">`)
+}
 
 export const reload = (): Plugin => {
   return {
@@ -41,8 +59,7 @@ export const reload = (): Plugin => {
 
       // HTML の head の末尾に virtualScriptId へのリンクのある script タグを挿入する
       const doc = parse(code)
-      doc.querySelector('head')?.insertAdjacentHTML('beforeend', `<script src="${virtualScriptId}">`)
-      // doc.querySelector('head')?.insertAdjacentHTML('beforeend', `<script src="${virtualScriptId}"></script>`)
+      insertVirtualScript(doc)
       return doc.toString()
     },
   }
