@@ -7,6 +7,14 @@ https://github.com/sapphi-red/micro-vite
 
 Thanks.
 
+## Rolldown 利用に書き換え
+
+Rolldown が beta リリースされたこともあり、試用してみました。
+
+`feat/rolldown` ブランチで `rollup` と `esbuild` を `rolldown` に置き換えています。
+
+開発サーバーでも `rolldown` によるビルドが行われます。
+
 ## フォルダ
 
 ### packages/micro-vite
