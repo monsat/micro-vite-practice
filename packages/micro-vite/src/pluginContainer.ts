@@ -3,7 +3,7 @@ import type {
   LoadResult,
   PartialResolvedId,
   SourceDescription,
-} from 'rollup'
+} from 'rolldown'
 
 // ここでは 3つの hook のみ対応する
 export type PluginContainer = {
@@ -17,7 +17,7 @@ export const createPluginContainer = (plugins: Plugin[]): PluginContainer => {
     async resolveId(id) {
       for (const plugin of plugins) {
         if (plugin.resolveId) {
-          // @ts-expect-error do not support rollup context
+          // @ts-expect-error do not support rolldown context
           const newId = await plugin.resolveId(id, undefined, undefined)
           if (newId) {
             id = typeof newId === 'string' ? newId : newId.id
@@ -30,7 +30,7 @@ export const createPluginContainer = (plugins: Plugin[]): PluginContainer => {
     async load(id) {
       for (const plugin of plugins) {
         if (plugin.load) {
-          // @ts-expect-error do not support rollup context
+          // @ts-expect-error do not support rolldown context
           const result = await plugin.load(id)
           if (result) {
             return result
@@ -42,7 +42,7 @@ export const createPluginContainer = (plugins: Plugin[]): PluginContainer => {
     async transform(code, id) {
       for (const plugin of plugins) {
         if (plugin.transform) {
-          // @ts-expect-error do not support rollup context
+          // @ts-expect-error do not support rolldown context
           const result = await plugin.transform(code, id)
           if (!result) {
             continue

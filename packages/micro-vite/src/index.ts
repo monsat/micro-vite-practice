@@ -5,13 +5,13 @@ import { startBuild } from './build'
 const cli = cac()
 
 cli.command('dev')
-  .action(() => {
-    startDev()
+  .action(async () => {
+    await startDev()
   })
 
 cli.command('build')
-  .action(() => {
-    startBuild()
+  .action(async () => {
+    await startBuild()
   })
 
 cli.help()
