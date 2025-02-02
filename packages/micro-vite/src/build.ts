@@ -1,15 +1,12 @@
 import * as path from 'node:path'
 import * as fs from 'node:fs/promises'
 import parse from 'node-html-parser'
-import { rollup } from 'rollup'
-import { getPlugins } from './plugins'
+import { rolldown } from 'rolldown'
 
 const root = process.cwd()
 const dist = path.resolve(root, './dist')
 
 export const startBuild = async () => {
-  const plugins = getPlugins(false) // 本番環境用のプラグインを取得
-
   await fs.rm(dist, {
     recursive: true,
     force: true,
@@ -21,10 +18,10 @@ export const startBuild = async () => {
   const distIndexHtmlPath = path.resolve(dist, './index.html')
   // index.html を加工して dist/index.html に出力する
   await processHtml(indexHtmlPath, distIndexHtmlPath, async (src) => {
-    // rollup でバンドルする
-    const bundle = await rollup({
+    // rolldown でバンドルする
+    const bundle = await rolldown({
       input: path.resolve(root, `.${src}`),
-      plugins,
+      plugins: [],
     })
 
     const { output } = await bundle.write({
